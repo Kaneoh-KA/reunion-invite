@@ -14,6 +14,7 @@ export default function ReunionInvite() {
   const [votes, setVotes] = useState(Array(restaurantCandidates.length).fill(0));
   const [votedIndex, setVotedIndex] = useState(null);
 
+  // 🎵 크리스마스 배경음악 자동 재생
   useEffect(() => {
     const audio = new Audio("https://cdn.pixabay.com/audio/2022/12/12/audio_45c3a4a14e.mp3");
     audio.loop = true;
@@ -22,16 +23,26 @@ export default function ReunionInvite() {
     return () => audio.pause();
   }, []);
 
+  // ✅ 투표 & 취소 기능
   const handleVote = (index) => {
-    if (votedIndex !== null) return;
     const newVotes = [...votes];
-    newVotes[index] += 1;
-    setVotes(newVotes);
-    setVotedIndex(index);
+
+    if (votedIndex === index) {
+      // 이미 눌렀던 후보 다시 누르면 투표 취소
+      newVotes[index] -= 1;
+      setVotes(newVotes);
+      setVotedIndex(null);
+    } else if (votedIndex === null) {
+      // 아직 투표 안 한 경우
+      newVotes[index] += 1;
+      setVotes(newVotes);
+      setVotedIndex(index);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-200 via-green-50 to-white flex flex-col items-center p-6 text-center relative overflow-hidden">
+      {/* ❄️ 눈 내리는 효과 */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(25)].map((_, i) => (
           <motion.div
@@ -47,41 +58,66 @@ export default function ReunionInvite() {
         ))}
       </div>
 
-      <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
-        className="text-4xl font-extrabold mb-4 text-green-900 drop-shadow-lg">
+      {/* 🎄 제목 */}
+      <motion.h1
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="text-4xl font-extrabold mb-4 text-green-900 drop-shadow-lg"
+      >
         🎄 수서초등학교 동창회 초대장 🎅
       </motion.h1>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.8 }}
-        className="mb-8 max-w-md bg-white/80 rounded-2xl p-5 shadow-lg backdrop-blur-sm border border-red-200">
+      {/* 🎁 소개 섹션 */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.8 }}
+        className="mb-8 max-w-md bg-white/80 rounded-2xl p-5 shadow-lg backdrop-blur-sm border border-red-200"
+      >
         <p className="text-lg mb-2 text-gray-800">🎁 수서동에서 다시 만나는 우리 반 친구들 💚</p>
         <div className="flex justify-center gap-3 text-green-800 mt-4">
           <div className="flex items-center gap-1"><MapPin size={18} /> 서울시 강남구 수서동</div>
         </div>
       </motion.div>
 
-      <motion.h2 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.7 }}
-        className="text-2xl font-semibold mb-3 text-red-700 drop-shadow-sm">
+      {/* 🍽 식당 후보 목록 */}
+      <motion.h2
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8, duration: 0.7 }}
+        className="text-2xl font-semibold mb-3 text-red-700 drop-shadow-sm"
+      >
         🍽 식당 후보 투표 🎄
       </motion.h2>
 
       <div className="grid gap-4 max-w-md w-full">
         {restaurantCandidates.map((r, i) => (
-          <div key={i} className={`shadow-md hover:shadow-2xl transition-all bg-white/90 p-4 rounded-xl ${votedIndex === i ? "border border-red-500" : ""}`}>
+          <div
+            key={i}
+            className={`shadow-md hover:shadow-2xl transition-all bg-white/90 p-4 rounded-xl ${votedIndex === i ? "border border-red-500" : ""}`}
+          >
             <h3 className="font-bold text-lg mb-1 flex items-center justify-center gap-2 text-green-900">
               {r.name}
               {votedIndex === i && <CheckCircle size={18} className="text-red-500" />}
             </h3>
             <p className="text-sm text-gray-600 mb-3">{r.desc}</p>
             <div className="flex gap-2 justify-center">
-              <a href={r.link} target="_blank" rel="noopener noreferrer"
-                 className="flex-1 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg py-2 font-medium transition-all">위치 보기</a>
+              <a
+                href={r.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg py-2 font-medium transition-all"
+              >
+                위치 보기
+              </a>
               <button
                 onClick={() => handleVote(i)}
-                disabled={votedIndex !== null}
-                className={`flex-1 rounded-lg py-2 font-medium text-white ${votedIndex === i ? "bg-gray-400" : "bg-red-600 hover:bg-red-700"}`}
+                className={`flex-1 rounded-lg py-2 font-medium text-white ${
+                  votedIndex === i ? "bg-gray-400 hover:bg-gray-500" : "bg-red-600 hover:bg-red-700"
+                }`}
               >
-                {votedIndex === i ? "투표 완료" : "투표하기"}
+                {votedIndex === i ? "투표 취소" : "투표하기"}
               </button>
             </div>
             <p className="text-xs text-gray-500 mt-2">현재 투표수: {votes[i]}</p>
@@ -89,7 +125,7 @@ export default function ReunionInvite() {
         ))}
       </div>
 
-      <p className="mt-10 text-sm text-gray-700">※ 한 번만 투표할 수 있습니다 🎅</p>
+      <p className="mt-10 text-sm text-gray-700">※ 다시 누르면 투표가 취소됩니다 🎅</p>
       <p className="text-sm text-gray-700">※ 참석 여부는 카카오톡으로 알려주세요 🎄</p>
     </div>
   );

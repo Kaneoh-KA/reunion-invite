@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 
 export default function ReunionInvite() {
   const restaurantCandidates = [
-    { name: "구이가 수서역점", desc: "고기 구이 전문점, 단체석 가능", link: "https://naver.me/FvEIFJWA" },
+    { name: "구이가 수서역점", desc: "돼지고기 구이 전문점", link: "https://naver.me/FvEIFJWA" },
     { name: "치킨매니아 수서일원점", desc: "바삭한 치킨과 맥주 한잔", link: "https://map.naver.com/p/entry/place/1016143694?placePath=%2Fhome" },
     { name: "가장맛있는족발 수서역점", desc: "족발, 보쌈, 막국수 전문점", link: "https://map.naver.com/p/entry/place/32805694?placePath=%2Fhome" },
     { name: "삼청동샤브 수서역점", desc: "샤브샤브와 건강식 메뉴", link: "https://map.naver.com/p/entry/place/1592151877?placePath=%2Fhome" },
-    { name: "수서동1번집 본점", desc: "백반과 한식 전문점, 편안한 분위기", link: "https://map.naver.com/p/entry/place/1743826102?placePath=%2Fhome" },
+    { name: "수서동1번집 본점", desc: "술 땡기는 이자카야", link: "https://map.naver.com/p/entry/place/1743826102?placePath=%2Fhome" },
   ];
 
   const [votes, setVotes] = useState(Array(restaurantCandidates.length).fill(0));
@@ -16,7 +16,7 @@ export default function ReunionInvite() {
 
   // 🎵 크리스마스 배경음악 자동 재생
   useEffect(() => {
-    const audio = new Audio("https://cdn.pixabay.com/audio/2022/12/12/audio_45c3a4a14e.mp3");
+    const audio = new Audio("https://pixabay.com/sound-effects/sound-effect-jingle-bells-jingle-bells-music-box-269306/");
     audio.loop = true;
     audio.volume = 0.3;
     audio.play().catch(() => {});
@@ -60,13 +60,13 @@ export default function ReunionInvite() {
 
       {/* 🎄 제목 */}
       <motion.h1
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="text-4xl font-extrabold mb-4 text-green-900 drop-shadow-lg"
-      >
-        🎄 수서초등학교 동창회 초대장 🎅
-      </motion.h1>
+  initial={{ opacity: 0, y: -20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8 }}
+  className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-green-900 drop-shadow-lg leading-tight"
+>
+  🎄 수서초등학교 동창회 초대장 🎅
+</motion.h1>
 
       {/* 🎁 소개 섹션 */}
       <motion.div
@@ -75,7 +75,7 @@ export default function ReunionInvite() {
         transition={{ delay: 0.4, duration: 0.8 }}
         className="mb-8 max-w-md bg-white/80 rounded-2xl p-5 shadow-lg backdrop-blur-sm border border-red-200"
       >
-        <p className="text-lg mb-2 text-gray-800">🎁 수서동에서 다시 만나는 우리 반 친구들 💚</p>
+        <p className="text-lg mb-2 text-gray-800">🎁 수서동에서 다시 만나는 초딩들 💚</p>
         <div className="flex justify-center gap-3 text-green-800 mt-4">
           <div className="flex items-center gap-1"><MapPin size={18} /> 서울시 강남구 수서동</div>
         </div>

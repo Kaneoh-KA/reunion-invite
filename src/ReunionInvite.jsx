@@ -1,8 +1,8 @@
+import { ref, get, update, onValue } from "firebase/database";
+import { db } from "./firebaseConfig";
 import { useState, useEffect } from "react";
 import { MapPin, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
-import { ref, get, update } from "firebase/database";
-import { db } from "./firebaseConfig";
 
 export default function ReunionInvite() {
   const restaurantCandidates = [
@@ -16,48 +16,52 @@ export default function ReunionInvite() {
   const [votes, setVotes] = useState(Array(restaurantCandidates.length).fill(0));
   const [votedIndex, setVotedIndex] = useState(null);
 
-  // 🎵 크리스마스 배경음악
+  // ✅ 처음 접속 시 localStorage 확인 & Firebase 리스너 설정
   useEffect(() => {
-    const audio = new Audio("https://cdn.pixabay.com/download/audio/2022/12/12/audio_45c3a4a14e.mp3?filename=jingle-bells-113003.mp3");
-    audio.loop = true;
-    audio.volume = 0.3;
-    audio.play().catch(() => {});
-    return () => audio.pause();
-  }, []);
+    const savedVote = localStorage.getItem("votedRestaurant");
+    if (savedVote !== null) {
+      setVotedIndex(parseInt(savedVote));
+    }
 
-  // ✅ Firebase 투표 데이터 불러오기
-  useEffect(() => {
-    const fetchVotes = async () => {
-      const snapshot = await get(ref(db, "votes"));
+    // 실시간 데이터 반영
+    const voteRef = ref(db, "votes");
+    const unsubscribe = onValue(voteRef, (snapshot) => {
       if (snapshot.exists()) {
-        const data = snapshot.val();
-        const updatedVotes = restaurantCandidates.map((_, i) => data[i] || 0);
-        setVotes(updatedVotes);
+        setVotes(snapshot.val());
       }
-    };
-    fetchVotes();
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  // ✅ 투표 / 취소 + Firebase 업데이트
+  // ✅ 투표 함수
   const handleVote = async (index) => {
+    if (votedIndex !== null && votedIndex !== index) {
+      alert("이미 투표하셨습니다 🎄");
+      return;
+    }
+
+    const voteRef = ref(db, "votes");
     const newVotes = [...votes];
-    const restaurantRef = ref(db, "votes");
 
     if (votedIndex === index) {
+      // 취소
       newVotes[index] -= 1;
+      localStorage.removeItem("votedRestaurant");
       setVotedIndex(null);
-    } else if (votedIndex === null) {
+    } else {
+      // 신규 투표
       newVotes[index] += 1;
+      localStorage.setItem("votedRestaurant", index);
       setVotedIndex(index);
     }
 
-    setVotes(newVotes);
-    await update(restaurantRef, { [index]: newVotes[index] });
+    await update(voteRef, newVotes);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-200 via-green-50 to-white flex flex-col items-center p-6 text-center relative overflow-hidden">
-      {/* ❄️ 눈송이 애니메이션 */}
+      {/* ❄️ 눈 내리는 효과 */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(25)].map((_, i) => (
           <motion.div
@@ -86,7 +90,7 @@ export default function ReunionInvite() {
         </motion.h1>
       </div>
 
-      {/* 🎁 소개 섹션 */}
+      {/* 🎁 소개 */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -95,13 +99,11 @@ export default function ReunionInvite() {
       >
         <p className="text-lg mb-2 text-gray-800">🎁 수서동에서 다시 만나는 초딩들 💚</p>
         <div className="flex justify-center gap-3 text-green-800 mt-4">
-          <div className="flex items-center gap-1">
-            <MapPin size={18} /> 서울시 강남구 수서동
-          </div>
+          <div className="flex items-center gap-1"><MapPin size={18} /> 서울시 강남구 수서동</div>
         </div>
       </motion.div>
 
-      {/* 🍽 식당 후보 목록 */}
+      {/* 🍽 투표 섹션 */}
       <motion.h2
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -115,9 +117,7 @@ export default function ReunionInvite() {
         {restaurantCandidates.map((r, i) => (
           <div
             key={i}
-            className={`shadow-md hover:shadow-2xl transition-all bg-white/90 p-4 rounded-xl ${
-              votedIndex === i ? "border border-red-500" : ""
-            }`}
+            className={`shadow-md hover:shadow-2xl transition-all bg-white/90 p-4 rounded-xl ${votedIndex === i ? "border border-red-500" : ""}`}
           >
             <h3 className="font-bold text-lg mb-1 flex items-center justify-center gap-2 text-green-900">
               {r.name}
@@ -147,9 +147,8 @@ export default function ReunionInvite() {
         ))}
       </div>
 
-      <p className="mt-10 text-sm text-gray-700">※ 다시 누르면 투표가 취소됩니다 🎅</p>
-      <p className="text-sm text-gray-700">※ 투표 결과는 실시간으로 저장됩니다 🎄</p>
-      <p className="text-sm text-gray-700">※ 참석 여부는 카카오톡으로 알려주세요 💌</p>
+      <p className="mt-10 text-sm text-gray-700">※ 투표는 한 번만 가능합니다 🎅</p>
+      <p className="text-sm text-gray-700">※ 새로고침 시에도 유지됩니다 🎄</p>
     </div>
   );
 }

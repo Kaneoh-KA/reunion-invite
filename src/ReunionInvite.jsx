@@ -1,4 +1,4 @@
-import { ref, get, update, onValue } from "firebase/database";
+import { ref, set, onValue } from "firebase/database";
 import { db } from "./firebaseConfig";
 import { useState, useEffect } from "react";
 import { MapPin, CheckCircle } from "lucide-react";
@@ -16,28 +16,32 @@ export default function ReunionInvite() {
   const [votes, setVotes] = useState(Array(restaurantCandidates.length).fill(0));
   const [votedIndex, setVotedIndex] = useState(null);
 
-  // ✅ 처음 접속 시 localStorage 확인 & Firebase 리스너 설정
+  // ✅ 로컬 저장된 투표 기록 불러오기 + 실시간 데이터 리스너
   useEffect(() => {
     const savedVote = localStorage.getItem("votedRestaurant");
     if (savedVote !== null) {
       setVotedIndex(parseInt(savedVote));
     }
 
-    // 실시간 데이터 반영
     const voteRef = ref(db, "votes");
+
+    // 실시간 데이터 반영
     const unsubscribe = onValue(voteRef, (snapshot) => {
       if (snapshot.exists()) {
         setVotes(snapshot.val());
+      } else {
+        // 초기값이 없으면 0으로 채움
+        setVotes(Array(restaurantCandidates.length).fill(0));
       }
     });
 
     return () => unsubscribe();
   }, []);
 
-  // ✅ 투표 함수
+  // ✅ 투표하기 / 취소하기
   const handleVote = async (index) => {
     if (votedIndex !== null && votedIndex !== index) {
-      alert("이미 투표하셨습니다 🎄");
+      alert("이미 다른 후보에 투표하셨습니다 🎄");
       return;
     }
 
@@ -56,7 +60,7 @@ export default function ReunionInvite() {
       setVotedIndex(index);
     }
 
-    await update(voteRef, newVotes);
+    await set(voteRef, newVotes); // ✅ update → set 으로 교체
   };
 
   return (
@@ -90,7 +94,7 @@ export default function ReunionInvite() {
         </motion.h1>
       </div>
 
-      {/* 🎁 소개 */}
+      {/* 🎁 소개 섹션 */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -103,7 +107,7 @@ export default function ReunionInvite() {
         </div>
       </motion.div>
 
-      {/* 🍽 투표 섹션 */}
+      {/* 🍽 식당 후보 투표 섹션 */}
       <motion.h2
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}

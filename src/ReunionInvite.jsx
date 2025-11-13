@@ -59,15 +59,18 @@ export default function ReunionInvite() {
       </div>
 
       {/* 🎄 제목 */}
-<motion.h1
-  initial={{ opacity: 0, y: -20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.8 }}
-  className="text-center text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-green-900 drop-shadow-lg leading-snug break-keep"
->
-  🎄 2025 수서초등학교<br />
-       동창회 초대장 🎅
-</motion.h1>
+<div className="flex flex-col items-center justify-center text-center">
+  <motion.h1
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8 }}
+    className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-green-900 drop-shadow-lg leading-snug break-keep"
+  >
+    🎄 2025 수서초등학교<br />
+    동창회 초대장 🎅
+  </motion.h1>
+</div>
+
 
 
       {/* 🎁 소개 섹션 */}

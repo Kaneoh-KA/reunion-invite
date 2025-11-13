@@ -67,10 +67,9 @@ export default function ReunionInvite() {
     className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-green-900 drop-shadow-lg leading-snug break-keep"
   >
     🎄 2025 수서초등학교<br />
-    동창회 초대장 🎅
+    <span className="inline-block pl-8">동창회 초대장 🎅</span>
   </motion.h1>
 </div>
-
 
 
       {/* 🎁 소개 섹션 */}
